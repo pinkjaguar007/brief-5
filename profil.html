@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Profil GitHub d'un développeur et ses dépôts publics.">
+    <title>DevScope - Profil</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+
+<body class="flex min-h-screen flex-col bg-slate-100 text-slate-800">
+
+    <header class="border-b border-slate-200 bg-white">
+        <div class="mx-auto flex w-full max-w-4xl flex-wrap items-center justify-between gap-3 px-4 py-3">
+
+            <a href="index.html" class="text-lg font-bold text-slate-900">DevScope</a>
+
+            <nav aria-label="Navigation principale">
+                <ul class="flex flex-wrap items-center gap-4 text-sm">
+                    <li>
+                        <a href="index.html" class="text-slate-600 hover:text-slate-900">Recherche</a>
+                    </li>
+                    <li>
+                        <a href="profil.html" aria-current="page" class="font-semibold text-slate-900">Profil</a>
+                    </li>
+                    <li>
+                        <a href="shortlist.html" class="text-slate-600 hover:text-slate-900">Shortlist</a>
+                    </li>
+                </ul>
+            </nav>
+
+            <p id="ratelimit" class="text-xs text-slate-500">GitHub : —</p>
+
+        </div>
+    </header>
+
+    <main id="main" class="flex-1 px-4 py-6">
+        <div class="mx-auto w-full max-w-4xl">
+
+            <form id="search-form" class="flex flex-col gap-2 sm:flex-row sm:items-start" novalidate>
+                <div class="flex-1">
+                    <label for="search-input" class="sr-only">Nom d'utilisateur GitHub</label>
+                    <input type="text" id="search-input" name="username" placeholder="Nom d'utilisateur GitHub"
+                        autocomplete="off" aria-describedby="search-error"
+                        class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none">
+                    <p id="search-error" class="mt-1 hidden text-sm text-red-600" role="alert"></p>
+                </div>
+                <button type="submit"
+                    class="rounded bg-slate-900 px-4 py-2 text-sm font-medium text-white hover:bg-slate-800">
+                    Analyser
+                </button>
+            </form>
+
+            <div id="loading" class="mt-8 text-center text-sm text-slate-500" role="status">
+                <p>Chargement...</p>
+            </div>
+
+            <div id="error" class="mt-6 hidden rounded border border-red-200 bg-red-50 p-4" role="alert">
+                <p id="error-message" class="text-sm text-red-700"></p>
+                <button id="retry-btn" type="button"
+                    class="mt-3 hidden rounded border border-red-300 bg-white px-3 py-2 text-sm text-red-700 hover:bg-red-100">
+                    Réessayer
+                </button>
+            </div>
+
+            <section id="profile" class="mt-6 hidden">
+
+                <div class="rounded border border-slate-200 bg-white p-5">
+                    <div class="flex flex-col gap-4 sm:flex-row">
+
+                        <div id="avatar-box" class="shrink-0"></div>
+
+                        <div class="min-w-0 flex-1">
+                            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                                <div class="min-w-0">
+                                    <h1 id="profile-name" class="text-xl font-bold text-slate-900">Profil</h1>
+                                    <p id="profile-login" class="text-sm text-slate-500"></p>
+                                </div>
+
+                                <div class="flex flex-wrap gap-2">
+                                    <a id="profile-link" href="#" target="_blank" rel="noopener noreferrer"
+                                        class="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100">
+                                        GitHub
+                                    </a>
+                                    <button id="add-btn" type="button"
+                                        class="rounded bg-slate-900 px-3 py-2 text-sm font-medium text-white hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-50">
+                                        Ajouter à la shortlist
+                                    </button>
+                                </div>
+                            </div>
+
+                            <p id="profile-bio" class="mt-3 text-sm text-slate-600"></p>
+                            <p id="profile-location" class="mt-2 text-sm text-slate-500"></p>
+                            <p id="profile-date" class="text-sm text-slate-500"></p>
+
+                            <p id="add-message" class="mt-2 hidden text-sm" role="status"></p>
+                        </div>
+
+                    </div>
+
+                    <div class="mt-4 grid grid-cols-3 gap-3 border-t border-slate-200 pt-4 text-center">
+                        <div>
+                            <p id="profile-repos" class="font-bold text-slate-900"></p>
+                            <p class="text-xs text-slate-500">Dépôts</p>
+                        </div>
+                        <div>
+                            <p id="profile-followers" class="font-bold text-slate-900"></p>
+                            <p class="text-xs text-slate-500">Abonnés</p>
+                        </div>
+                        <div>
+                            <p id="profile-following" class="font-bold text-slate-900"></p>
+                            <p class="text-xs text-slate-500">Abonnements</p>
+                        </div>
+                    </div>
+                </div>
+
+            </section>
+
+            <section id="repos" class="mt-8 hidden">
+
+                <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
+                    <h2 class="text-lg font-semibold text-slate-900">Dépôts</h2>
+
+                    <div class="flex flex-col gap-2 sm:flex-row">
+                        <div>
+                            <label for="repo-search" class="sr-only">Chercher un dépôt</label>
+                            <input type="text" id="repo-search" placeholder="Chercher un dépôt" autocomplete="off"
+                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none sm:w-48">
+                        </div>
+
+                        <div>
+                            <label for="repo-language" class="sr-only">Filtrer par langage</label>
+                            <select id="repo-language"
+                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none sm:w-40">
+                                <option value="">Tous les langages</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label for="repo-sort" class="sr-only">Trier les dépôts</label>
+                            <select id="repo-sort"
+                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none sm:w-44">
+                                <option value="stars">Étoiles</option>
+                                <option value="updated">Mise à jour</option>
+                                <option value="name">Nom</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <p id="repos-empty" class="mt-6 hidden text-center text-sm text-slate-500"></p>
+
+                <div id="repos-list" class="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3"></div>
+
+                <div id="pagination" class="mt-6 hidden items-center justify-center gap-3">
+                    <button id="prev-page" type="button"
+                        class="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40">
+                        Précédent
+                    </button>
+                    <p id="page-info" class="text-sm text-slate-500"></p>
+                    <button id="next-page" type="button"
+                        class="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40">
+                        Suivant
+                    </button>
+                </div>
+
+            </section>
+
+        </div>
+    </main>
+
+</body>
+
+</html>
