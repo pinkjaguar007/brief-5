@@ -32,3 +32,21 @@ export function formatDate(date) {
         year: "numeric"
     })
 }
+
+
+// transforme le code d'erreur de api.js en message lisible
+export function githubErrorMessage(error) {
+    if (error.message === "not_found") {
+        return "Développeur introuvable."
+    }
+
+    if (error.message === "rate_limit") {
+        return "Limite GitHub atteinte. Réessaie plus tard."
+    }
+
+    if (error.message === "network") {
+        return "Erreur réseau."
+    }
+
+    return "Une erreur est survenue."
+}

@@ -53,3 +53,14 @@ export async function request(url, options = {}) {
 
     return response.json()
 }
+
+
+///// API GitHub
+
+export function getUser(username) {
+    return request(GITHUB_API + "/users/" + encodeURIComponent(username))
+}
+
+export function getRepos(username) {
+    return request(GITHUB_API + "/users/" + encodeURIComponent(username) + "/repos?per_page=100&sort=updated")
+}
