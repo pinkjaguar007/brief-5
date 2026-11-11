@@ -26,6 +26,10 @@ const profileFollowing = document.querySelector("#profile-following")
 const profileLink = document.querySelector("#profile-link")
 const addBtn = document.querySelector("#add-btn")
 
+const reposSection = document.querySelector("#repos")
+const reposEmpty = document.querySelector("#repos-empty")
+const reposList = document.querySelector("#repos-list")
+
 let currentUser = null
 let allRepos = []
 
@@ -65,6 +69,7 @@ async function loadProfile(name) {
         allRepos = repos
 
         renderProfile(user)
+        renderRepos()
     } catch (error) {
         showError(githubErrorMessage(error), error.message === "network")
     }
@@ -95,6 +100,69 @@ function renderProfile(user) {
     searchInput.value = user.login
     loading.classList.add("hidden")
     profileSection.classList.remove("hidden")
+    reposSection.classList.remove("hidden")
+}
+
+
+///// dépôts publics
+
+function renderRepos() {
+    reposList.replaceChildren()
+
+    allRepos.forEach(function (repo) {
+        reposList.appendChild(createRepoCard(repo))
+    })
+
+    if (allRepos.length === 0) {
+        reposEmpty.textContent = "Aucun dépôt."
+        reposEmpty.classList.remove("hidden")
+    } else {
+        reposEmpty.classList.add("hidden")
+    }
+}
+
+
+function createRepoCard(repo) {
+    const card = document.createElement("article")
+    card.className = "flex h-full flex-col rounded border border-slate-200 bg-white p-4"
+
+    const name = document.createElement("a")
+    name.href = repo.html_url
+    name.target = "_blank"
+    name.rel = "noopener noreferrer"
+    name.textContent = repo.name
+    name.className = "font-semibold text-slate-900 hover:underline"
+
+    const description = document.createElement("p")
+    description.textContent = textOr(repo.description, "Pas de description.")
+    description.className = "mt-1 flex-1 text-sm text-slate-600"
+
+    const info = document.createElement("div")
+    info.className = "mt-3 flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-500"
+
+    const language = document.createElement("span")
+    language.textContent = "Langage : " + textOr(repo.language, "non précisé")
+
+    const stars = document.createElement("span")
+    stars.textContent = "Étoiles : " + repo.stargazers_count
+
+    const forks = document.createElement("span")
+    forks.textContent = "Forks : " + repo.forks_count
+
+    info.appendChild(language)
+    info.appendChild(stars)
+    info.appendChild(forks)
+
+    const updated = document.createElement("p")
+    updated.textContent = "Mis à jour le " + formatDate(repo.updated_at)
+    updated.className = "mt-2 text-xs text-slate-500"
+
+    card.appendChild(name)
+    card.appendChild(description)
+    card.appendChild(info)
+    card.appendChild(updated)
+
+    return card
 }
 
 
