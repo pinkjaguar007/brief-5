@@ -32,9 +32,17 @@ const repoLanguage = document.querySelector("#repo-language")
 const repoSort = document.querySelector("#repo-sort")
 const reposEmpty = document.querySelector("#repos-empty")
 const reposList = document.querySelector("#repos-list")
+const pagination = document.querySelector("#pagination")
+const prevPage = document.querySelector("#prev-page")
+const pageInfo = document.querySelector("#page-info")
+const nextPage = document.querySelector("#next-page")
+
+
+const REPOS_PER_PAGE = 6
 
 let currentUser = null
 let allRepos = []
+let currentPage = 1
 
 // nom lu dans l'adresse : profil.html?username=...
 const username = new URLSearchParams(window.location.search).get("username")
@@ -70,6 +78,7 @@ async function loadProfile(name) {
 
         currentUser = user
         allRepos = repos
+        currentPage = 1
 
         renderProfile(user)
         fillLanguages()
@@ -167,10 +176,18 @@ function getFilteredRepos() {
 
 function renderRepos() {
     const repos = getFilteredRepos()
+    const totalPages = Math.max(1, Math.ceil(repos.length / REPOS_PER_PAGE))
+
+    if (currentPage > totalPages) {
+        currentPage = totalPages
+    }
+
+    const start = (currentPage - 1) * REPOS_PER_PAGE
+    const visibleRepos = repos.slice(start, start + REPOS_PER_PAGE)
 
     reposList.replaceChildren()
 
-    repos.forEach(function (repo) {
+    visibleRepos.forEach(function (repo) {
         reposList.appendChild(createRepoCard(repo))
     })
 
@@ -184,6 +201,18 @@ function renderRepos() {
         reposEmpty.classList.remove("hidden")
     } else {
         reposEmpty.classList.add("hidden")
+    }
+
+    if (totalPages > 1) {
+        prevPage.disabled = currentPage === 1
+        nextPage.disabled = currentPage === totalPages
+        pageInfo.textContent = "Page " + currentPage + " / " + totalPages
+
+        pagination.classList.remove("hidden")
+        pagination.classList.add("flex")
+    } else {
+        pagination.classList.add("hidden")
+        pagination.classList.remove("flex")
     }
 }
 
@@ -233,14 +262,27 @@ function createRepoCard(repo) {
 
 
 repoSearch.addEventListener("input", function () {
+    currentPage = 1
     renderRepos()
 })
 
 repoLanguage.addEventListener("change", function () {
+    currentPage = 1
     renderRepos()
 })
 
 repoSort.addEventListener("change", function () {
+    currentPage = 1
+    renderRepos()
+})
+
+prevPage.addEventListener("click", function () {
+    currentPage = currentPage - 1
+    renderRepos()
+})
+
+nextPage.addEventListener("click", function () {
+    currentPage = currentPage + 1
     renderRepos()
 })
 
