@@ -27,6 +27,9 @@ const profileLink = document.querySelector("#profile-link")
 const addBtn = document.querySelector("#add-btn")
 
 const reposSection = document.querySelector("#repos")
+const repoSearch = document.querySelector("#repo-search")
+const repoLanguage = document.querySelector("#repo-language")
+const repoSort = document.querySelector("#repo-sort")
 const reposEmpty = document.querySelector("#repos-empty")
 const reposList = document.querySelector("#repos-list")
 
@@ -69,6 +72,7 @@ async function loadProfile(name) {
         allRepos = repos
 
         renderProfile(user)
+        fillLanguages()
         renderRepos()
     } catch (error) {
         showError(githubErrorMessage(error), error.message === "network")
@@ -106,15 +110,77 @@ function renderProfile(user) {
 
 ///// dépôts publics
 
-function renderRepos() {
-    reposList.replaceChildren()
+function fillLanguages() {
+    const languages = []
 
     allRepos.forEach(function (repo) {
+        if (repo.language !== null && repo.language !== "" && !languages.includes(repo.language)) {
+            languages.push(repo.language)
+        }
+    })
+
+    languages.sort()
+
+    while (repoLanguage.options.length > 1) {
+        repoLanguage.remove(1)
+    }
+
+    languages.forEach(function (language) {
+        const option = document.createElement("option")
+        option.value = language
+        option.textContent = language
+        repoLanguage.appendChild(option)
+    })
+
+    repoSearch.value = ""
+    repoLanguage.value = ""
+    repoSort.value = "stars"
+}
+
+
+function getFilteredRepos() {
+    const search = repoSearch.value.trim().toLowerCase()
+    const language = repoLanguage.value
+    const sort = repoSort.value
+
+    const repos = allRepos.filter(function (repo) {
+        const sameName = repo.name.toLowerCase().includes(search)
+        const sameLanguage = language === "" || repo.language === language
+        return sameName && sameLanguage
+    })
+
+    repos.sort(function (a, b) {
+        if (sort === "updated") {
+            return new Date(b.updated_at) - new Date(a.updated_at)
+        }
+
+        if (sort === "name") {
+            return a.name.localeCompare(b.name)
+        }
+
+        return b.stargazers_count - a.stargazers_count
+    })
+
+    return repos
+}
+
+
+function renderRepos() {
+    const repos = getFilteredRepos()
+
+    reposList.replaceChildren()
+
+    repos.forEach(function (repo) {
         reposList.appendChild(createRepoCard(repo))
     })
 
-    if (allRepos.length === 0) {
-        reposEmpty.textContent = "Aucun dépôt."
+    if (repos.length === 0) {
+        if (allRepos.length === 0) {
+            reposEmpty.textContent = "Aucun dépôt."
+        } else {
+            reposEmpty.textContent = "Aucun résultat."
+        }
+
         reposEmpty.classList.remove("hidden")
     } else {
         reposEmpty.classList.add("hidden")
@@ -164,6 +230,19 @@ function createRepoCard(repo) {
 
     return card
 }
+
+
+repoSearch.addEventListener("input", function () {
+    renderRepos()
+})
+
+repoLanguage.addEventListener("change", function () {
+    renderRepos()
+})
+
+repoSort.addEventListener("change", function () {
+    renderRepos()
+})
 
 
 ///// petite barre de recherche en haut de la page
