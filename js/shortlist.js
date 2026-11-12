@@ -1,4 +1,4 @@
-///// page shortlist : liste des candidats
+///// page shortlist : liste des candidats, recherche et tri
 
 import { getCandidates } from './api.js'
 import { textOr, formatDate } from './utils.js'
@@ -6,6 +6,10 @@ import { textOr, formatDate } from './utils.js'
 
 const list = document.querySelector("#candidates-list")
 const loading = document.querySelector("#loading")
+const errorBox = document.querySelector("#error")
+const errorMessage = document.querySelector("#error-message")
+const retryBtn = document.querySelector("#retry-btn")
+const empty = document.querySelector("#empty")
 const count = document.querySelector("#count")
 const searchInput = document.querySelector("#search-input")
 const sortSelect = document.querySelector("#sort-select")
@@ -17,6 +21,16 @@ let candidates = null
 
 function showLoading() {
     loading.classList.remove("hidden")
+    errorBox.classList.add("hidden")
+    empty.classList.add("hidden")
+    list.replaceChildren()
+}
+
+
+function showError(message) {
+    loading.classList.add("hidden")
+    errorBox.classList.remove("hidden")
+    errorMessage.textContent = message
     list.replaceChildren()
 }
 
@@ -28,7 +42,13 @@ async function loadShortlist() {
         candidates = await getCandidates()
         renderCandidates()
     } catch (error) {
-        console.error(error)
+        count.textContent = "0 candidat"
+
+        if (error.message === "network") {
+            showError("Erreur réseau.")
+        } else {
+            showError("Chargement impossible.")
+        }
     }
 }
 
@@ -80,6 +100,16 @@ function renderCandidates() {
         count.textContent = candidates.length + " candidats"
     } else {
         count.textContent = candidates.length + " candidat"
+    }
+
+    if (candidates.length === 0) {
+        empty.textContent = "Aucun candidat."
+        empty.classList.remove("hidden")
+    } else if (results.length === 0) {
+        empty.textContent = "Aucun résultat."
+        empty.classList.remove("hidden")
+    } else {
+        empty.classList.add("hidden")
     }
 
     loading.classList.add("hidden")
@@ -147,6 +177,10 @@ sortSelect.addEventListener("change", function () {
     if (candidates !== null) {
         renderCandidates()
     }
+})
+
+retryBtn.addEventListener("click", function () {
+    loadShortlist()
 })
 
 
