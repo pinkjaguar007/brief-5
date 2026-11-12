@@ -7,6 +7,8 @@ import { textOr, formatDate } from './utils.js'
 const list = document.querySelector("#candidates-list")
 const loading = document.querySelector("#loading")
 const count = document.querySelector("#count")
+const searchInput = document.querySelector("#search-input")
+const sortSelect = document.querySelector("#sort-select")
 
 
 // null tant que le GET n'a pas répondu
@@ -31,12 +33,46 @@ async function loadShortlist() {
 }
 
 
+function addedTime(candidate) {
+    if (!candidate.added_at) return 0
+
+    const time = new Date(candidate.added_at).getTime()
+
+    if (isNaN(time)) return 0
+
+    return time
+}
+
+
 function renderCandidates() {
     if (candidates === null) return
 
+    const search = searchInput.value.trim().toLowerCase()
+    const sort = sortSelect.value
+
+    const results = candidates.filter(function (candidate) {
+        const name = textOr(candidate.name, "").toLowerCase()
+        const login = textOr(candidate.login, "").toLowerCase()
+        return name.includes(search) || login.includes(search)
+    })
+
+    results.sort(function (a, b) {
+        if (sort === "name") {
+            const nameA = textOr(a.name, a.login).toLowerCase()
+            const nameB = textOr(b.name, b.login).toLowerCase()
+            return nameA.localeCompare(nameB)
+        }
+
+        if (sort === "oldest") {
+            return addedTime(a) - addedTime(b)
+        }
+
+        return addedTime(b) - addedTime(a)
+    })
+
     list.replaceChildren()
 
-    candidates.forEach(function (candidate) {
+    results.forEach(function (candidate) {
         list.appendChild(createCandidateCard(candidate))
     })
 
@@ -99,6 +135,19 @@ function createCandidateCard(candidate) {
 
     return card
 }
+
+
+searchInput.addEventListener("input", function () {
+    if (candidates !== null) {
+        renderCandidates()
+    }
+})
+
+sortSelect.addEventListener("change", function () {
+    if (candidates !== null) {
+        renderCandidates()
+    }
+})
 
 
 ///// lancement de la page
