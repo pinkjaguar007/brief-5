@@ -1,6 +1,6 @@
-///// page profil : le développeur et ses dépôts
+///// page profil : le développeur, ses dépôts et l'ajout à la shortlist
 
-import { getUser, getRepos } from './api.js'
+import { getUser, getRepos, getCandidates, addCandidate } from './api.js'
 import { isValidUsername, textOr, formatDate, githubErrorMessage } from './utils.js'
 
 
@@ -25,6 +25,7 @@ const profileFollowers = document.querySelector("#profile-followers")
 const profileFollowing = document.querySelector("#profile-following")
 const profileLink = document.querySelector("#profile-link")
 const addBtn = document.querySelector("#add-btn")
+const addMessage = document.querySelector("#add-message")
 
 const reposSection = document.querySelector("#repos")
 const repoSearch = document.querySelector("#repo-search")
@@ -54,6 +55,7 @@ function showLoading() {
     loading.classList.remove("hidden")
     errorBox.classList.add("hidden")
     profileSection.classList.add("hidden")
+    reposSection.classList.add("hidden")
 }
 
 
@@ -83,6 +85,7 @@ async function loadProfile(name) {
         renderProfile(user)
         fillLanguages()
         renderRepos()
+        checkShortlist(user)
     } catch (error) {
         showError(githubErrorMessage(error), error.message === "network")
     }
@@ -107,8 +110,10 @@ function renderProfile(user) {
     profileFollowing.textContent = textOr(user.following, 0)
     profileLink.href = user.html_url
 
-    // l'ajout à la shortlist arrive plus tard
+    // le bouton attend la vérification de la shortlist
     addBtn.disabled = true
+    addBtn.textContent = "Vérification..."
+    addMessage.classList.add("hidden")
 
     searchInput.value = user.login
     loading.classList.add("hidden")
@@ -117,7 +122,91 @@ function renderProfile(user) {
 }
 
 
-///// dépôts publics
+///// ajout à la shortlist (sans doublon)
+
+function candidateExists(candidates, login) {
+    return candidates.some(function (candidate) {
+        return textOr(candidate.login, "").toLowerCase() === login.toLowerCase()
+    })
+}
+
+
+async function checkShortlist(user) {
+    try {
+        const candidates = await getCandidates()
+
+        if (candidateExists(candidates, user.login)) {
+            addBtn.textContent = "Déjà dans la shortlist"
+        } else {
+            addBtn.disabled = false
+            addBtn.textContent = "Ajouter à la shortlist"
+        }
+    } catch (error) {
+        // pas bloquant : la vérification sera refaite au moment du clic
+        addBtn.disabled = false
+        addBtn.textContent = "Ajouter à la shortlist"
+    }
+}
+
+
+addBtn.addEventListener("click", async function () {
+    if (currentUser === null) return
+
+    addBtn.disabled = true
+    addBtn.textContent = "Ajout..."
+    addMessage.classList.add("hidden")
+
+    try {
+        const candidates = await getCandidates()
+
+        if (candidateExists(candidates, currentUser.login)) {
+            addBtn.textContent = "Déjà dans la shortlist"
+            showAddMessage("Déjà dans la shortlist.", false)
+            return
+        }
+
+        const candidate = {
+            login: currentUser.login,
+            name: textOr(currentUser.name, currentUser.login),
+            avatar_url: currentUser.avatar_url,
+            html_url: currentUser.html_url,
+            location: textOr(currentUser.location, ""),
+            public_repos: currentUser.public_repos,
+            followers: currentUser.followers,
+            added_at: new Date().toISOString()
+        }
+
+        await addCandidate(candidate)
+
+        addBtn.textContent = "Ajouté à la shortlist"
+        showAddMessage("Candidat ajouté.", true)
+    } catch (error) {
+        addBtn.disabled = false
+        addBtn.textContent = "Ajouter à la shortlist"
+
+        if (error.message === "network") {
+            showAddMessage("Erreur réseau.", false)
+        } else {
+            showAddMessage("Ajout impossible.", false)
+        }
+    }
+})
+
+
+function showAddMessage(message, success) {
+    addMessage.textContent = message
+    addMessage.classList.remove("hidden", "text-slate-700", "text-red-600")
+
+    if (success) {
+        addMessage.classList.add("text-slate-700")
+    } else {
+        addMessage.classList.add("text-red-600")
+    }
+}
+
+
+///// dépôts : recherche, filtre, tri et pagination
+// tout se fait dans le navigateur, sur les dépôts déjà chargés
 
 function fillLanguages() {
     const languages = []
