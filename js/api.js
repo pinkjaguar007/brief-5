@@ -1,4 +1,4 @@
-///// toutes les requêtes de l'application
+///// toutes les requêtes de l'application (GitHub et MockAPI)
 
 const GITHUB_API = "https://api.github.com"
 
