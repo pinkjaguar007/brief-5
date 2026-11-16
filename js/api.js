@@ -2,17 +2,13 @@
 
 const GITHUB_API = "https://api.github.com"
 
-// remplace cette adresse par celle de ta collection MockAPI (voir README)
-const MOCKAPI_URL = "https://VOTRE-ID.mockapi.io/api/v1/candidates"
+// collection MockAPI qui stocke la shortlist
+const MOCKAPI_URL = "https://6afaef45730c1d152f32c71a.mockapi.io/v1/candidates"
 
-// tant que l'adresse MockAPI n'est pas configurée, la shortlist est gardée
-// dans le navigateur pour que l'application reste utilisable
+// si l'adresse ci-dessus n'est pas renseignée, la shortlist passe en mode démo
 const DEMO_MODE = MOCKAPI_URL.includes("VOTRE-ID")
 const STORAGE_KEY = "devscope-candidates"
 
-
-///// fonction de base pour tous les appels
-// fetch + async / await, response.ok vérifié avant d'utiliser les données
 
 export async function request(url, options = {}) {
     let response
