@@ -30,8 +30,6 @@
                 </ul>
             </nav>
 
-            <p id="ratelimit" class="text-xs text-slate-500">GitHub : —</p>
-
         </div>
     </header>
 
@@ -119,51 +117,11 @@
 
             <section id="repos" class="mt-8 hidden">
 
-                <div class="flex flex-col gap-3 lg:flex-row lg:items-end lg:justify-between">
-                    <h2 class="text-lg font-semibold text-slate-900">Dépôts</h2>
-
-                    <div class="flex flex-col gap-2 sm:flex-row">
-                        <div>
-                            <label for="repo-search" class="sr-only">Chercher un dépôt</label>
-                            <input type="text" id="repo-search" placeholder="Chercher un dépôt" autocomplete="off"
-                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 placeholder:text-slate-400 focus:border-slate-500 focus:outline-none sm:w-48">
-                        </div>
-
-                        <div>
-                            <label for="repo-language" class="sr-only">Filtrer par langage</label>
-                            <select id="repo-language"
-                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none sm:w-40">
-                                <option value="">Tous les langages</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label for="repo-sort" class="sr-only">Trier les dépôts</label>
-                            <select id="repo-sort"
-                                class="w-full rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 focus:border-slate-500 focus:outline-none sm:w-44">
-                                <option value="stars">Étoiles</option>
-                                <option value="updated">Mise à jour</option>
-                                <option value="name">Nom</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
+                <h2 class="text-lg font-semibold text-slate-900">Dépôts</h2>
 
                 <p id="repos-empty" class="mt-6 hidden text-center text-sm text-slate-500"></p>
 
                 <div id="repos-list" class="mt-4 grid gap-3 md:grid-cols-2 lg:grid-cols-3"></div>
-
-                <div id="pagination" class="mt-6 hidden items-center justify-center gap-3">
-                    <button id="prev-page" type="button"
-                        class="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40">
-                        Précédent
-                    </button>
-                    <p id="page-info" class="text-sm text-slate-500"></p>
-                    <button id="next-page" type="button"
-                        class="rounded border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40">
-                        Suivant
-                    </button>
-                </div>
 
             </section>
 

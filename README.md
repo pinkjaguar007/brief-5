@@ -23,27 +23,17 @@ Projet individuel réalisé pendant la formation web de **YouCode Safi**.
 - Photo, nom, login, bio, ville, date d'inscription, dépôts, abonnés et abonnements.
 - Texte par défaut quand une information est vide dans l'API GitHub.
 - Lien vers le profil GitHub.
-- Dépôts affichés en cartes : nom, description, langage, étoiles, forks et date de mise à jour.
+- Dépôts affichés en cartes : nom, description, langage, étoiles, forks et date de mise à jour (ordre renvoyé par GitHub, du plus récemment mis à jour au plus ancien).
 - Ajout à la shortlist sans doublon, avec un message de confirmation.
 - Chargement, erreur 404, limite GitHub et erreur réseau avec bouton « Réessayer ».
 
 ### Shortlist (`shortlist.html`)
 
-- Chargement des candidats depuis MockAPI.
+- Chargement des candidats depuis MockAPI (ou `localStorage` en mode démo).
 - Nombre total de candidats.
 - Recherche par nom ou login.
 - Tri par nom ou par date d'ajout.
 - Message quand la shortlist est vide ou quand la recherche ne donne rien.
-
-### Bonus
-
-- Recherche d'un dépôt par son nom.
-- Filtre par langage, rempli à partir des dépôts du profil.
-- Tri des dépôts par étoiles, date de mise à jour ou nom.
-- Pagination des dépôts par 6.
-- Nombre de requêtes GitHub restantes dans la barre de navigation.
-
-La recherche, le filtre, le tri et la pagination des dépôts se font dans le navigateur : aucune nouvelle requête GitHub.
 
 ## Structure
 
